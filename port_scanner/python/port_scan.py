@@ -16,46 +16,41 @@ class HostClass:
             self.open_ports = []
             self.closed_ports = []
 
-
-def conn_scan(host_object):
-    """
-    Connects to the host on the port given.
-    :param: HostClass object to parse hosts/ports from and connect with.
-    :return: 0 for success, 1 for error/failure.
-    """
-    for host in host_object.valid_hosts:
-        for port in host_object.ports:
-            try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((host, port))
-                s.close()
-                print('[+] Socket connected! ' + str(host + ":" + str(port)))
-
-            except:
-
-
-
-def resolve_host(host_list):
-    """
-    Handles conversion of hostname to IPV4 addresses for all hosts in list.
-    :param host_list: List of hosts to convert.
-    :return: Hosts object that contains list of ports, valid, and invalid hosts.
-    """
-    hosts = HostClass()
-    for host in host_list:
+    def resolve_host(self, hostname):
         try:
-            hosts.valid_hosts.append(socket.gethostbyname(host))
-        except Exception as e:
-            hosts.invalid_hosts.append(host)
-    return hosts
+            self.host.append(socket.gethostbyname(hostname))
+        except:
+            return
+
+    def conn_scan(self):
+        for port in self.ports:
+            try:
+                socket.setdefaulttimeout(1)
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((self.host, port))
+                self.results.open_ports.append(port)
+            except:
+                self.results.closed_ports.append(port)
+            finally:
+                s.close()
 
 
 def main():
     host_list = ['scanme.nmap.org']
-    port_list = [80, 443]
-    host_object = resolve_host(host_list)
+    port_list = [22, 25, 53, 80, 443]
+    host_object = HostClass()
     host_object.ports = port_list
-    conn_scan(host_object)
+    for host in host_list:
+        host_object.host = host
+        host_object.conn_scan()
+        print('[+] Results for host %s' % host)
+        print('[+] Open ports: ')
+        for open_port in host_object.results.open_ports:
+            print('\t' + str(open_port))
+        print('[+] Closed ports: ')
+        for closed_port in host_object.results.closed_ports:
+
+            print('\t' + str(closed_port))
 
 
 if __name__ == "__main__":
