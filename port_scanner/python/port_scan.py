@@ -49,7 +49,6 @@ def main():
             print('\t' + str(open_port))
         print('[+] Closed ports: ')
         for closed_port in host_object.results.closed_ports:
-
             print('\t' + str(closed_port))
 
 
