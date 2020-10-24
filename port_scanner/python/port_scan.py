@@ -18,7 +18,7 @@ class HostClass:
 
     def resolve_host(self, hostname):
         try:
-            self.host.append(socket.gethostbyname(hostname))
+            self.host = str(socket.gethostbyname(hostname))
         except:
             return
 
@@ -38,12 +38,16 @@ class HostClass:
 def main():
     host_list = ['scanme.nmap.org']
     port_list = [22, 25, 53, 80, 443]
-    host_object = HostClass()
-    host_object.ports = port_list
+    hosts = []
     for host in host_list:
+        host_object = HostClass()
+        host_object.ports = port_list
         host_object.host = host
         host_object.conn_scan()
-        print('[+] Results for host %s' % host)
+        hosts.append(host_object)
+
+    for host_object in hosts:
+        print('[+] Results for host %s' % host_object.host)
         print('[+] Open ports: ')
         for open_port in host_object.results.open_ports:
             print('\t' + str(open_port))
